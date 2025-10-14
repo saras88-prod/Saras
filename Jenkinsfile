@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://your-git-repo.git'
+                git url: 'https://github.com/saras88-prod/Saras.git'
             }
         }
 
