@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Replace with your DockerHub username/repo
-        IMAGE_NAME = 'saraswathi6/React'
+        IMAGE_NAME = 'saraswathi6/trend-react'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
 
         // Jenkins credential IDs you set up
@@ -48,11 +48,11 @@ pipeline {
                         export KUBECONFIG=$KUBECONFIG
 
                         echo "🔄 Replacing image in deployment.yaml..."
-                        sed -i "s|image:.*|image: '${IMAGE_NAME}:${IMAGE_TAG}'|" k8s/deployment.yaml
+                        sed -i "s|image:.*|image: '${IMAGE_NAME}:${IMAGE_TAG}'|" deployment.yaml
 
                         echo "📄 Applying Kubernetes manifests..."
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl apply -f k8s/service.yaml
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
                     '''
                 }
             }
