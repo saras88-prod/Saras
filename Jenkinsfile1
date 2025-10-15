@@ -2,36 +2,29 @@ pipeline {
     agent any
 
     environment {
-        // Replace with your DockerHub username/repo
-        IMAGE_NAME = 'saraswathi6/trend-react'
+        IMAGE_NAME = "saraswathi6/trend-react"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-
-        // Jenkins credential IDs you set up
-        DOCKER_CREDENTIALS_ID = 'dockerhub-creds'
-        KUBECONFIG_CREDENTIALS_ID = 'kubeconfig'
+        DOCKER_CREDENTIALS_ID = "dockerhub-creds"
+        KUBECONFIG_CREDENTIALS_ID = "kubeconfig"
     }
 
     stages {
-
-        stage('Checkout Source') {
+        stage('Checkout') {
             steps {
-                echo '📥 Cloning repository...'
-                checkout scm
+                git branch: 'master', url: 'https://github.com/saras88-prod/Saras.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                echo "🐳 Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
                 script {
                     docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push to Docker Hub') {
             steps {
-                echo "🚀 Pushing Docker image to Docker Hub"
                 withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: '']) {
                     script {
                         docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
@@ -42,29 +35,21 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                echo "📦 Deploying to Kubernetes cluster"
                 withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
                     sh '''
                         export KUBECONFIG=$KUBECONFIG
-
-                        echo "🔄 Replacing image in deployment.yaml..."
-                        sed -i "s|image:.*|image: '${IMAGE_NAME}:${IMAGE_TAG}'|" deployment.yaml
-
-                        echo "📄 Applying Kubernetes manifests..."
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
+                        kubectl set image deployment/nginx-deployment nginx=${IMAGE_NAME}:${IMAGE_TAG} -n default
                     '''
                 }
             }
         }
     }
-
     post {
         success {
-            echo "✅ Deployment successful!"
+            echo 'Deployment Successful!'
         }
         failure {
-            echo "❌ Deployment failed!"
+            echo 'Deployment Failed.'
         }
     }
 }
