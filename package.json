@@ -1,3 +1,13 @@
 {
-    "type": "commonjs"
+    "type": "commonjs",
+    "name": "jenkind",
+    "version": "1.0.0",
+    "description": "Second line for the alert",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }
