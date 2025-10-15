@@ -5,7 +5,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy the pre-built React files from your repo into the nginx html folder
-COPY build /usr/share/nginx/html
+COPY /trend-app/build /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
